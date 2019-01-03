@@ -1,7 +1,4 @@
-import util.Assignment;
-import util.Instance;
-import util.Nogood;
-import util.Tuple;
+import util.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,9 +13,9 @@ public class CDNL_ASP {
     public static Assignment solve(Instance instance) {
         Integer current_dl = 0;
         Assignment a = new Assignment();
-
+        guesses = new HashMap<>();
         while(true) {
-            a = unitPropagationNaive(instance, a);
+            a = NaiveUnitPropagation.propagate(instance, a);
             if(instance.isContained(a) && current_dl == 0) {
                 return new Assignment();
             }
@@ -54,36 +51,6 @@ public class CDNL_ASP {
 
     private static Integer getGuess(Integer dl) {
         return guesses.get(dl);
-    }
-
-    public static Assignment unitPropagationNaive(Instance instance, Assignment curr) {
-        int size = 0;
-        do {
-            size = curr.getLiteralSet().size();
-            curr = unitPropagationStepNaive(instance, curr);
-        } while(size != curr.getLiteralSet().size());
-
-        return curr;
-    }
-
-    public static Assignment unitPropagationStepNaive(Instance instance, Assignment curr) {
-        Nogood n = instance.findUnit(curr);
-        while(n != null) {
-            if(instance.isContained(curr)) {
-                return curr;
-            }
-
-            Integer I = n.under(curr).iterator().next(); //We only have one element here, since n is unit under curr
-
-            Integer decisionLevel = curr.getMaxDlWithoutLit(n, I);
-
-            Integer Ineg = I*(-1);
-            curr.addAssignment(Ineg, decisionLevel, n);
-
-            n = instance.findUnit(curr);
-        }
-
-        return curr;
     }
 
     public static Tuple<Nogood, Integer> ConflictAnalysisFirstUIP(Nogood conflict, Instance instance, Assignment a) {

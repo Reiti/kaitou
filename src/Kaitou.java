@@ -14,10 +14,11 @@ public class Kaitou {
         */
        //testSAT_DPLL();
        //testUNSAT_DPLL();
-        //testSAT_CDNL();
-        //testUNSAT_CDNL();
+       // testSAT_CDNL();
+       // testUNSAT_CDNL();
 
-        Tuple<List<Rule>, Map<Integer, String>> res = readASPInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\out.lparse");
+
+        Tuple<List<Rule>, Map<Integer, String>> res = readASPInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\coloring.lparse");
 
         List<Rule> program = res.getFirst();
         Map<Integer, String> dictionary = res.getSecond();
@@ -39,26 +40,31 @@ public class Kaitou {
 
         Set<String> answerSet = new HashSet<>();
         Assignment a = CDNL_ASP.solve(i);
-        for(Integer lit: a.getLiteralSet()) {
-            boolean neg = lit < 0;
-            if(neg) {
-                if(dictionary.get(lit*(-1)) != null) {
-                    answerSet.add("-"+dictionary.get(lit*(-1)));
+        if(a.getLiteralSet().size() == 0) {
+            System.out.println("No answer set");
+        }
+        else {
+            for (Integer lit : a.getLiteralSet()) {
+                boolean neg = lit < 0;
+                if (neg) {
+                    if (dictionary.get(lit * (-1)) != null) {
+                        //answerSet.add("-" + dictionary.get(lit * (-1)));
+                    }
+                } else {
+                    if (dictionary.get(lit) != null) {
+                        answerSet.add(dictionary.get(lit));
+                    }
                 }
             }
-            else {
-                if(dictionary.get(lit) != null) {
-                    answerSet.add(dictionary.get(lit));
-                }
+
+
+            System.out.println("{");
+            for (String l : answerSet) {
+                System.out.println(l);
             }
+            System.out.println("}");
         }
-
-
-        System.out.println("{");
-        for(String l: answerSet) {
-            System.out.println(l);
-        }
-        System.out.println("}");
+        
     }
 
     public static Tuple<List<Rule>, Map<Integer, String>> readASPInput(String filename) throws IOException {
@@ -69,6 +75,7 @@ public class Kaitou {
         List<Integer> alwaysTrue = new ArrayList<>(); //might need later
         List<Integer> alwaysFalse = new ArrayList<>(); //might need later
         while(!currline.startsWith("0")) { //Parse rules
+            currline = currline.replaceAll("\\s+", " ");
             String[] split = currline.trim().split(" ");
             Integer head = Integer.parseInt(split[1]);
             int totalNumber = Integer.parseInt(split[2]);
@@ -88,6 +95,7 @@ public class Kaitou {
         }
         currline = lines.next();
         while(!currline.startsWith("0")) { //Dictionary
+            currline = currline.replaceAll("\\s+", " ");
             String[] split = currline.trim().split(" ");
             Integer lit = Integer.parseInt(split[0]);
             dict.put(lit, split[1]);

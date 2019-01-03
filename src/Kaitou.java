@@ -1,27 +1,119 @@
-import util.Instance;
-import util.Nogood;
+import util.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("Duplicates")
 public class Kaitou {
     public static void main(String[] args) throws IOException {
-       /* Instance instance = readInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\uf20-02-sat.cnf");
+       /* Instance instance = readSatInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\uf20-02-sat.cnf");
         System.out.println(DPLL.solve(instance));
         */
        //testSAT_DPLL();
        //testUNSAT_DPLL();
-        testSAT_CDNL();
-        testUNSAT_CDNL();
+        //testSAT_CDNL();
+        //testUNSAT_CDNL();
+
+        Tuple<List<Rule>, Map<Integer, String>> res = readASPInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\out.lparse");
+
+        List<Rule> program = res.getFirst();
+        Map<Integer, String> dictionary = res.getSecond();
+        for(Rule r: program) {
+            String h = dictionary.get(r.getHead());
+            System.out.print(h+"<-");
+            for(Integer n: r.getNbody()) {
+                System.out.print("not "+dictionary.get(n)+",");
+            }
+            for(Integer p: r.getPbody()) {
+                System.out.print(dictionary.get(p)+",");
+            }
+            System.out.println("");
+        }
+
+        int max = dictionary.keySet().stream().max(Integer::compareTo).get();
+
+        Instance i = CC.translate(program, max, dictionary.keySet());
+
+        Set<String> answerSet = new HashSet<>();
+        Assignment a = CDNL_ASP.solve(i);
+        for(Integer lit: a.getLiteralSet()) {
+            boolean neg = lit < 0;
+            if(neg) {
+                if(dictionary.get(lit*(-1)) != null) {
+                    answerSet.add("-"+dictionary.get(lit*(-1)));
+                }
+            }
+            else {
+                if(dictionary.get(lit) != null) {
+                    answerSet.add(dictionary.get(lit));
+                }
+            }
+        }
+
+
+        System.out.println("{");
+        for(String l: answerSet) {
+            System.out.println(l);
+        }
+        System.out.println("}");
+    }
+
+    public static Tuple<List<Rule>, Map<Integer, String>> readASPInput(String filename) throws IOException {
+        Iterator<String> lines = Files.lines(Paths.get(filename)).iterator();
+        String currline = lines.next();
+        List<Rule> program = new ArrayList<>();
+        Map<Integer, String> dict = new HashMap<>();
+        List<Integer> alwaysTrue = new ArrayList<>(); //might need later
+        List<Integer> alwaysFalse = new ArrayList<>(); //might need later
+        while(!currline.startsWith("0")) { //Parse rules
+            String[] split = currline.trim().split(" ");
+            Integer head = Integer.parseInt(split[1]);
+            int totalNumber = Integer.parseInt(split[2]);
+            int noNeg = Integer.parseInt(split[3]);
+            Set<Integer> nbody = new HashSet<>();
+            Set<Integer> pbody = new HashSet<>();
+            for(int i=4; i<(4 + noNeg); i++) {
+                Integer n = Integer.parseInt(split[i]);
+                nbody.add(n);
+            }
+            for(int i=(4 + noNeg); i<(4+totalNumber); i++) {
+                Integer n = Integer.parseInt(split[i]);
+                pbody.add(n);
+            }
+            program.add(new Rule(head, nbody, pbody));
+            currline = lines.next();
+        }
+        currline = lines.next();
+        while(!currline.startsWith("0")) { //Dictionary
+            String[] split = currline.trim().split(" ");
+            Integer lit = Integer.parseInt(split[0]);
+            dict.put(lit, split[1]);
+            currline = lines.next();
+        }
+        currline = lines.next(); //B+
+        currline = lines.next();
+        while(!currline.startsWith("0")) {
+            String lit = currline.trim();
+            alwaysTrue.add(Integer.parseInt(lit));
+            currline = lines.next();
+        }
+        currline = lines.next(); //B-
+        currline = lines.next();
+        while(!currline.startsWith("0")) {
+            String lit = currline.trim();
+            alwaysFalse.add(Integer.parseInt(lit));
+            currline = lines.next();
+        }
+        //done
+
+        return new Tuple<List<Rule>, Map<Integer, String>>(program, dict);
     }
 
 
-    public static Instance readInput(String filename) throws IOException {
+    public static Instance readSatInput(String filename) throws IOException {
         List<String> lines = Files.lines(Paths.get(filename)).filter(s -> !s.startsWith("c")).collect(Collectors.toList());
         String format = lines.get(0);
         List<Nogood> nogoods = new ArrayList<>();
@@ -50,7 +142,7 @@ public class Kaitou {
         for(int i=1; i<=1000; i++) {
             String currp = path+i+".cnf";
             try {
-                Instance in = readInput(currp);
+                Instance in = readSatInput(currp);
                 if(!DPLL.solve(in)) {
                     System.out.println("Error");
                 }
@@ -67,7 +159,7 @@ public class Kaitou {
             String currp = path+i+".cnf";
             System.out.println(i);
             try {
-                Instance in = readInput(currp);
+                Instance in = readSatInput(currp);
                 if(DPLL.solve(in)) {
                     System.out.println("Error");
                     throw new RuntimeException();
@@ -84,7 +176,7 @@ public class Kaitou {
         for(int i=1; i<=1000; i++) {
             String currp = path+i+".cnf";
             try {
-                Instance in = readInput(currp);
+                Instance in = readSatInput(currp);
                 if(!CDNL.solve(in)) {
                     System.out.println("Error");
                 }
@@ -101,7 +193,7 @@ public class Kaitou {
             String currp = path+i+".cnf";
             System.out.println(i);
             try {
-                Instance in = readInput(currp);
+                Instance in = readSatInput(currp);
                 if(CDNL.solve(in)) {
                     System.out.println("Error");
                     throw new RuntimeException();

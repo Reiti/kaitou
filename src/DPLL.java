@@ -12,8 +12,7 @@ public class DPLL {
     public static boolean solve(Instance instance) {
         Integer current_dl = 0;
         Assignment a = new Assignment();
-        PropagationStrategy prop = new WatchedLiteralsUnitPropagation(instance);
-        PropagationStrategy nprop = new NaiveUnitPropagation();
+        PropagationStrategy prop = new NaiveUnitPropagation();
         guesses = new HashMap<>();
         while(true) {
             a = prop.propagate(instance, a, a.getRecentlyChanged());

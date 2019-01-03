@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 public class Kaitou {
     public static void main(String[] args) throws IOException {
       //Instance instance = readSatInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\input.cnf");
-       //System.out.println(CDNL.solve(instance));
+      //System.out.println(CDNL.solve(instance));
 
         long time = System.currentTimeMillis();
        //testSAT_DPLL();
        //testUNSAT_DPLL();
        //testSAT_CDNL();
-       testUNSAT_CDNL();
+       //testUNSAT_CDNL();
 
         System.out.println("Total Time: "+(System.currentTimeMillis() - time));
 
@@ -67,7 +67,8 @@ public class Kaitou {
             }
             System.out.println("}");
         }
-*/
+        */
+
     }
 
     public static Tuple<List<Rule>, Map<Integer, String>> readASPInput(String filename) throws IOException {

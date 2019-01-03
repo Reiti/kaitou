@@ -75,13 +75,15 @@ public class Assignment {
         return max;
     }
     public void remove(Integer maxDl) {
-
-
         assignment = assignment.stream().filter(integerIntegerNogoodTriplet -> {
             Integer dl = integerIntegerNogoodTriplet.getSecond();
             Integer lit = integerIntegerNogoodTriplet.getFirst();
             return dl <= maxDl;
         }).collect(Collectors.toList());
+
+        if(assignment.size() != 0) {
+            recentlyChanged = assignment.get(assignment.size() - 1).getFirst();
+        }
     }
 
     public boolean isComplete(Instance instance) {

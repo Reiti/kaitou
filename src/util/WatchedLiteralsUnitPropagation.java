@@ -36,7 +36,13 @@ public class WatchedLiteralsUnitPropagation implements PropagationStrategy{
     }
 
     public Assignment propagate(Instance i, Assignment a, Integer recentlyChanged) {
-        Integer changedLiteral = recentlyChanged;
+        for(Nogood n: i.getInstance()) { //TODO: Propagation of unit Nogoods should probably not be handled separately
+            if(n.getLiterals().size() == 1) {
+                Integer lit = n.getLiterals().iterator().next();
+                a.addAssignment(lit*(-1), 0, null);
+            }
+        }
+        Integer changedLiteral = a.getRecentlyChanged();
         Set<Integer> changedLits = new HashSet<>();
         changedLits.add(changedLiteral);
         while(!changedLits.isEmpty()) {
@@ -122,6 +128,33 @@ public class WatchedLiteralsUnitPropagation implements PropagationStrategy{
         return res;
     }
 
+
+    public void addNogood(Nogood n, Assignment a, Integer rec) {
+        Set<Integer> watched = new HashSet<>();
+        watched.add(rec);
+        for (Integer lit : n.getLiterals()) {
+            if(!a.getLiteralSet().contains(lit) && !a.getLiteralSet().contains(lit*(-1))) {
+                watched.add(lit);
+            }
+            if (watched.size() == 2) {
+                break;
+            }
+        }
+
+        watchedLiterals.put(n, watched);
+
+        for(Integer lit: watched) {
+            Set<Nogood> watching = watchingNogoods.get(lit);
+            if(watching == null) {
+                watching = new HashSet<>();
+            }
+            watching.add(n);
+            watchingNogoods.put(lit, watching);
+        }
+
+
+    }
+    /*
     public void addNogood(Nogood n, Assignment a, Integer rec) {
         Set<Integer> watched = new HashSet<>();
         if(n.getLiterals().size() == 1) {
@@ -160,6 +193,7 @@ public class WatchedLiteralsUnitPropagation implements PropagationStrategy{
 
 
     }
+    */
 
 
 }

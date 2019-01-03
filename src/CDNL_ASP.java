@@ -15,7 +15,6 @@ public class CDNL_ASP {
         Assignment a = new Assignment();
         PropagationStrategy prop = new NaiveUnitPropagation();
         guesses = new HashMap<>();
-        Integer recentlyChanged = 0;
         while(true) {
             a = prop.propagate(instance, a, a.getRecentlyChanged());
             if(instance.isContained(a) && current_dl == 0) {
@@ -28,6 +27,7 @@ public class CDNL_ASP {
                 Integer k = nk.getSecond();
                 instance.addNogood(nprime);
                 a.remove(k);
+                prop.addNogood(nprime, a, a.getRecentlyChanged());
                 current_dl = k;
 
             } else if(a.isComplete(instance)) {
@@ -43,7 +43,6 @@ public class CDNL_ASP {
                 current_dl = current_dl + 1;
                 setGuess(current_dl, I);
                 a.addAssignment(I, current_dl, null);
-                recentlyChanged = I;
             }
         }
     }

@@ -1,8 +1,12 @@
 package util;
 
-public class NaiveUnitPropagation {
+public class NaiveUnitPropagation implements PropagationStrategy{
 
-    public static Assignment propagate(Instance instance, Assignment curr) {
+    public NaiveUnitPropagation() {
+
+    }
+
+    public Assignment propagate(Instance instance, Assignment curr, Integer recentlyChanged) {
         int size = 0;
         do {
             size = curr.getLiteralSet().size();
@@ -12,7 +16,7 @@ public class NaiveUnitPropagation {
         return curr;
     }
 
-    private static Assignment propagationStep(Instance instance, Assignment curr) {
+    private Assignment propagationStep(Instance instance, Assignment curr) {
         Nogood n = instance.findUnit(curr);
         while(n != null) {
             if(instance.isContained(curr)) {
@@ -30,5 +34,9 @@ public class NaiveUnitPropagation {
         }
 
         return curr;
+    }
+
+    public void addNogood(Nogood n, Assignment a, Integer rec) {
+        //Do nothing
     }
 }

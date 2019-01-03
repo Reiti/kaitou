@@ -9,15 +9,18 @@ import java.util.stream.Collectors;
 @SuppressWarnings("Duplicates")
 public class Kaitou {
     public static void main(String[] args) throws IOException {
-       /* Instance instance = readSatInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\uf20-02-sat.cnf");
-        System.out.println(DPLL.solve(instance));
-        */
+      //Instance instance = readSatInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\input.cnf");
+       //System.out.println(CDNL.solve(instance));
+
+        long time = System.currentTimeMillis();
        //testSAT_DPLL();
        //testUNSAT_DPLL();
-       // testSAT_CDNL();
-       // testUNSAT_CDNL();
+       //testSAT_CDNL();
+       testUNSAT_CDNL();
 
+        System.out.println("Total Time: "+(System.currentTimeMillis() - time));
 
+/*
         Tuple<List<Rule>, Map<Integer, String>> res = readASPInput("C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\coloring.lparse");
 
         List<Rule> program = res.getFirst();
@@ -64,7 +67,7 @@ public class Kaitou {
             }
             System.out.println("}");
         }
-        
+*/
     }
 
     public static Tuple<List<Rule>, Map<Integer, String>> readASPInput(String filename) throws IOException {
@@ -149,6 +152,7 @@ public class Kaitou {
         String path = "C:\\Users\\Reiti\\Documents\\Uni\\Master\\STKR\\uf20-91.tar\\uf20-91\\uf20-0";
         for(int i=1; i<=1000; i++) {
             String currp = path+i+".cnf";
+            System.out.println(i);
             try {
                 Instance in = readSatInput(currp);
                 if(!DPLL.solve(in)) {
@@ -185,6 +189,7 @@ public class Kaitou {
             String currp = path+i+".cnf";
             try {
                 Instance in = readSatInput(currp);
+                System.out.println(i);
                 if(!CDNL.solve(in)) {
                     System.out.println("Error");
                 }

@@ -13,9 +13,11 @@ public class CDNL_ASP {
     public static Assignment solve(Instance instance) {
         Integer current_dl = 0;
         Assignment a = new Assignment();
+        PropagationStrategy prop = new NaiveUnitPropagation();
         guesses = new HashMap<>();
+        Integer recentlyChanged = 0;
         while(true) {
-            a = NaiveUnitPropagation.propagate(instance, a);
+            a = prop.propagate(instance, a, a.getRecentlyChanged());
             if(instance.isContained(a) && current_dl == 0) {
                 return new Assignment();
             }
@@ -41,6 +43,7 @@ public class CDNL_ASP {
                 current_dl = current_dl + 1;
                 setGuess(current_dl, I);
                 a.addAssignment(I, current_dl, null);
+                recentlyChanged = I;
             }
         }
     }

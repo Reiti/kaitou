@@ -1,7 +1,4 @@
-import util.Assignment;
-import util.Instance;
-import util.NaiveUnitPropagation;
-import util.Nogood;
+import util.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,9 +12,11 @@ public class DPLL {
     public static boolean solve(Instance instance) {
         Integer current_dl = 0;
         Assignment a = new Assignment();
+        PropagationStrategy prop = new WatchedLiteralsUnitPropagation(instance);
+        PropagationStrategy nprop = new NaiveUnitPropagation();
         guesses = new HashMap<>();
         while(true) {
-            a = NaiveUnitPropagation.propagate(instance, a);
+            a = prop.propagate(instance, a, a.getRecentlyChanged());
             if(instance.isContained(a) && current_dl == 0) {
                 return false;
             }
@@ -37,6 +36,7 @@ public class DPLL {
                 Integer I = getGuess(k + 1);
                 current_dl = current_dl - 1;
                 a.addAssignment(I * (-1), k, null);
+
             } else if(a.isComplete(instance)) {
                /* for(Triplet<Integer, Integer, Nogood> t: a.getAssignment()) {
                     Integer lit = t.getFirst();

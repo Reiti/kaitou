@@ -13,9 +13,11 @@ public class CDNL {
     public static boolean solve(Instance instance) {
         Integer current_dl = 0;
         Assignment a = new Assignment();
+        PropagationStrategy prop = new WatchedLiteralsUnitPropagation(instance);
+        PropagationStrategy nprop = new NaiveUnitPropagation();
         guesses = new HashMap<>();
         while(true) {
-            a = NaiveUnitPropagation.propagate(instance, a);
+            a = prop.propagate(instance, a, a.getRecentlyChanged());
             if(instance.isContained(a) && current_dl == 0) {
                 return false;
             }
@@ -26,6 +28,7 @@ public class CDNL {
                 Integer k = nk.getSecond();
                 instance.addNogood(nprime);
                 a.remove(k);
+                prop.addNogood(nprime, a, a.getRecentlyChanged());
                 current_dl = k;
 
             } else if(a.isComplete(instance)) {

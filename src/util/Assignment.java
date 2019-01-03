@@ -8,8 +8,15 @@ import java.util.stream.Collectors;
 public class Assignment {
 
     private List<Triplet<Integer, Integer, Nogood>> assignment;
+    private Integer recentlyChanged = 0;
     public Assignment() {
+        recentlyChanged = 0;
         assignment = new ArrayList<>();
+    }
+
+    public Assignment(Assignment a) {
+        assignment = new ArrayList<>(a.getAssignment());
+        recentlyChanged = a.getRecentlyChanged();
     }
 
     public List<Triplet<Integer, Integer, Nogood>> getAssignment() {
@@ -17,6 +24,7 @@ public class Assignment {
     }
 
     public void addAssignment(Integer literal, Integer dl, Nogood nogood) {
+        recentlyChanged = literal;
         assignment.add(new Triplet<>(literal, dl, nogood));
     }
 
@@ -67,6 +75,8 @@ public class Assignment {
         return max;
     }
     public void remove(Integer maxDl) {
+
+
         assignment = assignment.stream().filter(integerIntegerNogoodTriplet -> {
             Integer dl = integerIntegerNogoodTriplet.getSecond();
             Integer lit = integerIntegerNogoodTriplet.getFirst();
@@ -94,10 +104,20 @@ public class Assignment {
             if(dl > highest) {
                 secondHighest = highest;
                 highest = dl;
+            } else if(dl > secondHighest) {
+                secondHighest = dl;
             }
         }
 
         return secondHighest;
+    }
+
+    public int getRecentlyChanged() {
+        return recentlyChanged;
+    }
+
+    public void setRecentlyChanged(Integer recentlyChanged) {
+        this.recentlyChanged = recentlyChanged;
     }
 
 }

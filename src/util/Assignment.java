@@ -95,6 +95,9 @@ public class Assignment {
                 secondHighest = highest;
                 highest = dl;
             }
+            else if(dl > secondHighest) {
+                secondHighest = dl;
+            }
         }
 
         return secondHighest;
